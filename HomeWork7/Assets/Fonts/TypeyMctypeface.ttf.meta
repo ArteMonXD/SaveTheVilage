@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 0cee6f37c3e6cee42905c709aace714c
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Typey McTypeface
+  fontNames:
+  - Typey McTypeface
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: c9ef823bfc928714b95899e923ee8ad3, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

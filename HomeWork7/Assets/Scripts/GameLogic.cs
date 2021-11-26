@@ -41,6 +41,7 @@ public class GameLogic : MonoBehaviour
     public int startCountEnemy;
     public int startPeasantCount;
     public int startWheatCount;
+    public int startWarriorCount;
     public int countDifficultyIncreases;
     private int _increaseEnemies;
     private int _currentSeriesToRaid;
@@ -82,6 +83,7 @@ public class GameLogic : MonoBehaviour
         _currentPeasantCount = startPeasantCount;
         _currentWheatCount = startWheatCount;
         _currentSeriesToRaid = countSeriesToEnemyRaid;
+        _currentWarriorCount = startWarriorCount;
         _increaseEnemies = 1;
         seriesTruceIndicator.gameObject.SetActive(true);
         countEnemyIndicatorPanel.SetActive(false);
@@ -273,6 +275,7 @@ public class GameLogic : MonoBehaviour
     {
         Pause(true);
         winPanel.PanelOpen();
+        soundManager.WinAudioPlay();
     }
     private void Lose()
     {

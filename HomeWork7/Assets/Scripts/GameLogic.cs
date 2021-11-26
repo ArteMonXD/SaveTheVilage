@@ -24,8 +24,8 @@ public class GameLogic : MonoBehaviour
     public GameObject costWarriorPanel;
     public GameObject costPeasantPanel;
     public GameObject countEnemyIndicatorPanel;
-    public GameObject winPanel;
-    public GameObject losePanel;
+    public PauseLoseWin winPanel;
+    public PauseLoseWin losePanel;
     public float timeWheatCollect;
     public float timeEnemyRaid;
     public float timeEating;
@@ -41,6 +41,8 @@ public class GameLogic : MonoBehaviour
     public int startCountEnemy;
     public int startPeasantCount;
     public int startWheatCount;
+    public int countDifficultyIncreases;
+    private int _increaseEnemies;
     private int _currentSeriesToRaid;
     private int _currentCountEnemy;
     private int _currentPeasantCount;
@@ -70,6 +72,7 @@ public class GameLogic : MonoBehaviour
     }
     public void StartGame()
     {
+        statisticManager.SatisticClear();
         _currentTimeWheatCollect = timeWheatCollect;
         _currentTimeEnemyRaid = timeEnemyRaid;
         _currentTimeEating = timeEating;
@@ -79,8 +82,15 @@ public class GameLogic : MonoBehaviour
         _currentPeasantCount = startPeasantCount;
         _currentWheatCount = startWheatCount;
         _currentSeriesToRaid = countSeriesToEnemyRaid;
+        _increaseEnemies = 1;
         seriesTruceIndicator.gameObject.SetActive(true);
         countEnemyIndicatorPanel.SetActive(false);
+        costPeasantPanel.SetActive(true);
+        costWarriorPanel.SetActive(true);
+        clockTraningPeasantIndicator.fillAmount = 0;
+        clockTraningWarriorIndicator.fillAmount = 0;
+        clockEnemyRaidIndicator.fillAmount = 1;
+        statisticManager.UpdateHirePeasant(startPeasantCount);
         _traningPeasant = false;
         _traningWarrior = false;
         _truce = true;
@@ -90,6 +100,7 @@ public class GameLogic : MonoBehaviour
         if (_currentTimeWheatCollect <= 0)
         {
             _currentWheatCount += countMinedWheat * _currentPeasantCount;
+            statisticManager.UpdateAccumulatedWheat(countMinedWheat * _currentPeasantCount);
             _currentTimeWheatCollect = timeWheatCollect;
             soundManager.WheatCollectAudioPlay();
         }
@@ -123,7 +134,10 @@ public class GameLogic : MonoBehaviour
                     _currentWarriorCount = 0;
                     Lose();
                 }
-                _currentCountEnemy += 2;
+                statisticManager.UpdateValueCountRaid();
+                if (statisticManager.countRaid % countDifficultyIncreases == 0)
+                    _increaseEnemies++;
+                _currentCountEnemy += _increaseEnemies;
                 _currentTimeEnemyRaid = timeEnemyRaid;
             }
         }
@@ -135,9 +149,15 @@ public class GameLogic : MonoBehaviour
         {
             soundManager.EatingAudioPlay();
             if (_currentWarriorCount * countEatingWheat > _currentWheatCount)
+            {
+                statisticManager.UpdateWheatEaten(_currentWheatCount);
                 _currentWheatCount = 0;
+            }
             else
+            {
+                statisticManager.UpdateWheatEaten(_currentWarriorCount * countEatingWheat);
                 _currentWheatCount -= _currentWarriorCount * countEatingWheat;
+            }
             _currentTimeEating = timeEating;
         }
         _currentTimeEating -= Time.deltaTime;
@@ -149,6 +169,7 @@ public class GameLogic : MonoBehaviour
             soundManager.PeasantAudioPlay();
             _traningPeasant = false;
             _currentPeasantCount++;
+            statisticManager.UpdateHirePeasant(_currentPeasantCount);
             _currentTimeTraningPearsant = timeTraningPeasant;
             costPeasantPanel.SetActive(true);
         }
@@ -161,6 +182,7 @@ public class GameLogic : MonoBehaviour
             soundManager.KnightAudioPlay();
             _traningWarrior = false;
             _currentWarriorCount++;
+            statisticManager.UpdateHireWarriors();
             _currentTimeTraningWarrior = timeTraningWarrior;
             costWarriorPanel.SetActive(true);
         }
@@ -235,6 +257,13 @@ public class GameLogic : MonoBehaviour
         if(seriesTruceIndicator.gameObject.activeSelf)
             seriesTruceIndicator.text = _currentSeriesToRaid.ToString();
     }
+    public void Pause(bool on)
+    {
+        if (on)
+            Time.timeScale = 0;
+        else
+            Time.timeScale = 1;
+    }
     private void CheckWin()
     {
         if (_currentWheatCount >= winCountWheat || _currentPeasantCount >= winCountPeasant)
@@ -242,12 +271,12 @@ public class GameLogic : MonoBehaviour
     }
     private void Win()
     {
-        Time.timeScale = 0;
-        winPanel.SetActive(true);
+        Pause(true);
+        winPanel.PanelOpen();
     }
     private void Lose()
     {
-        Time.timeScale = 0;
-        losePanel.SetActive(true);
+        Pause(true);
+        losePanel.PanelOpen();
     }
 }
